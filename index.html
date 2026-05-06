@@ -62,6 +62,10 @@
   .snum.red{background:#c0392b}
   .stext{flex:1;padding-top:4px;font-size:.97em}
 
+  .url-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .copy-btn{appearance:none;border:1px solid #cbd5e0;background:#fff;color:#1a4480;border-radius:10px;padding:8px 12px;font-weight:700;font-size:.88em;cursor:pointer;transition:all .15s}
+  .copy-btn:hover{border-color:#1a4480;background:#ebf8ff}
+  .copy-btn:active{transform:translateY(1px)}
   /* SUBSECTIONS */
   .sub-head{font-size:1.05em;font-weight:700;color:#2d3748;margin:22px 0 8px;padding-left:10px;border-left:3px solid #1a4480}
 
@@ -291,18 +295,38 @@
       <li><div class="snum">6</div><div class="stext">Пройдите установку: <strong>«Далее»</strong> → <strong>«Установить»</strong> → <strong>«Готово»</strong></div></li>
     </ul>
 
-    <p class="sub-head">Шаг 2 — Добавьте сервер через QR-код</p>
-    <div class="info">💡 На компьютере камеры нет — QR-код сканируем с экрана через встроенную функцию Hiddify.</div>
+    <p class="sub-head">Шаг 2 — Добавьте сервер (QR или URL)</p>
+    <div class="info">💡 На ПК чаще всего удобно импортировать через ссылку (URL). Если у вас есть QR — можно отсканировать его прямо с экрана.</div>
+
+    <p class="sub-head" style="margin-top:14px">Вариант A — через «+» и ссылку (URL)</p>
     <ul class="steps">
       <li><div class="snum">1</div><div class="stext">Откройте приложение <strong>Hiddify</strong></div></li>
-      <li><div class="snum">2</div><div class="stext">Нажмите кнопку <strong>«+»</strong> в левой панели или вверху</div></li>
+      <li><div class="snum">2</div><div class="stext">Нажмите <strong>«+»</strong></div></li>
+      <li><div class="snum">3</div><div class="stext">Выберите пункт <strong>«Добавить по ссылке / URL»</strong> (название может немного отличаться)</div></li>
+      <li><div class="snum">4</div><div class="stext">Вставьте URL в поле:</div></li>
+      <li>
+        <div class="snum">5</div>
+        <div class="stext">
+          <div class="url-row">
+            <a href="http://157.173.98.206:2096/sub/9xl413zwdq314p7s" target="_blank" rel="noopener noreferrer"><strong>http://157.173.98.206:2096/sub/9xl413zwdq314p7s</strong></a>
+            <button class="copy-btn" type="button" data-copy="http://157.173.98.206:2096/sub/9xl413zwdq314p7s" onclick="copyUrl(this)">Скопировать URL</button>
+          </div>
+        </div>
+      </li>
+      <li><div class="snum">6</div><div class="stext">Нажмите <strong>«Добавить»</strong> / <strong>«Импортировать»</strong> — сервер(а) появятся в списке</div></li>
+    </ul>
+
+    <p class="sub-head" style="margin-top:14px">Вариант B — через QR-код (скан с экрана)</p>
+    <div class="info">💡 Камера не нужна — можно выбрать <strong>«Scan QR from Screen»</strong> и выделить QR-код на экране.</div>
+    <ul class="steps">
+      <li><div class="snum">1</div><div class="stext">Откройте <strong>Hiddify</strong></div></li>
+      <li><div class="snum">2</div><div class="stext">Нажмите <strong>«+»</strong> (в левой панели или сверху)</div></li>
       <li><div class="snum">3</div><div class="stext">Выберите <strong>«Добавить по QR-коду»</strong> или <strong>«Scan QR from Screen»</strong></div></li>
-      <li><div class="snum">4</div><div class="stext">Курсором выделите область с QR-кодом на этой странице (откройте её в браузере) — Hiddify считает код с экрана</div></li>
+      <li><div class="snum">4</div><div class="stext">Выделите область с QR-кодом на этой странице — Hiddify считает код с экрана</div></li>
       <li><div class="snum">5</div><div class="stext">Сервер появится в списке</div></li>
     </ul>
 
-    <div class="warn">🔄 Если сканирование экрана не работает — откройте QR-код на телефоне и отсканируйте телефон веб-камерой ПК, или используйте способ ниже через ссылку.</div>
-
+    <div class="warn">🔄 Если «Scan QR from Screen» не работает — используйте импорт по URL (вариант A).</div>
     <p class="sub-head">Шаг 3 — Подключитесь</p>
     <ul class="steps">
       <li><div class="snum green">1</div><div class="stext">Нажмите на добавленный сервер в списке</div></li>
@@ -367,6 +391,40 @@
 </footer>
 
 <script>
+  async function copyUrl(btn) {
+    const text = btn?.dataset?.copy || '';
+    if (!text) return;
+
+    const prev = btn.textContent;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      btn.textContent = 'Скопировано';
+      btn.style.borderColor = '#48bb78';
+      btn.style.color = '#276749';
+      btn.style.background = '#f0fff4';
+      setTimeout(() => {
+        btn.textContent = prev;
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        btn.style.background = '';
+      }, 1200);
+    } catch (e) {
+      btn.textContent = 'Не удалось';
+      setTimeout(() => (btn.textContent = prev), 1200);
+    }
+  }
   function show(id) {
     document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
